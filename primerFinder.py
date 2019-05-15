@@ -3,6 +3,12 @@ from model import Sample,OrientedSample
 MIN_PRIMER_LENGTH =18
 segmentTable = {}
 
+plasmidForwardTable = {}
+plasmidReverseTable = {}
+segmentList = []
+plasmidForwardList = []
+plasmidReverseList = []
+
 def findGCClamps(seq):
     GCClampStarts = []
     for i in range(len(seq)-5):
@@ -11,7 +17,7 @@ def findGCClamps(seq):
             GCClampStarts.append(i)
     return GCClampStarts
 
-def findPossibleInsertPrimers(sample):
+def findPossiblePrimers(sample):
     mainSample = sample.gDNA1
     commonInsertRegions = [mainSample.sequence[mainSample.insertPos[0]:mainSample.insertPos[1]]]
     if (len(mainSample.introns) > 0):
@@ -21,10 +27,12 @@ def findPossibleInsertPrimers(sample):
 
     ##filter out fragments too short to match a primer
     commonInsertRegions = [x for x in commonInsertRegions if len(x) > MIN_PRIMER_LENGTH]
-    ##print(commonInsertRegions)
     possibleStarts = [(x,findGCClamps(x)) for x in commonInsertRegions]
-    populateSegTable(possibleStarts)
-    print(segmentTable)
+    populateTMList(possibleStarts,segmentList,segmentList)
+    possiblePlasmidStarts = [(x,findGCClamps(x)) for x in sample.plasmid]
+    populateTMList(possiblePlasmidStarts,plasmidForwardList,plasmidReverseList)
+    #TODO: make primer triplets here
+    print(sorted([(x[1],x[0])for x in segmentList]))
     return []
 
 ##make segments
@@ -32,34 +40,33 @@ def generateComplement(segment):
     comp = {'A':'T','C':'G','T':'A','G':'C'}
     return ''.join([comp[i] for i in segment[::-1]])
 
-def populateSegTable(segStarts):
+def populateTMList(segStarts,forwardList,reverseList):
     for starts in segStarts:
         segLen = len(starts[0])
         for j in starts[1]:
             if j >= 13:
-                segmentTable[generateComplement(starts[0][j-13:j+5])] = calculateTM(starts[0][j-13:j+5])
+                forwardList.append((generateComplement(starts[0][j-13:j+5]),calculateTM(starts[0][j-13:j+5])))
                 if j >= 14:
-                    segmentTable[generateComplement(starts[0][j-14:j+5])] = calculateTM(starts[0][j-14:j+5])
+                    forwardList.append((generateComplement(starts[0][j-14:j+5]),calculateTM(starts[0][j-14:j+5])))
                     if j >= 15:
-                        segmentTable[generateComplement(starts[0][j-15:j+5])] = calculateTM(starts[0][j-15:j+5])
+                        forwardList.append((generateComplement(starts[0][j-15:j+5]),calculateTM(starts[0][j-15:j+5])))
                         if j >= 16:
-                            segmentTable[generateComplement(starts[0][j-16:j+5])] = calculateTM(starts[0][j-16:j+5])
+                            forwardList.append((generateComplement(starts[0][j-16:j+5]),calculateTM(starts[0][j-16:j+5])))
                             if j >= 17:
-                                segmentTable[generateComplement(starts[0][j-17:j+5])] = calculateTM(starts[0][j-17:j+5])
+                                forwardList.append((generateComplement(starts[0][j-17:j+5]),calculateTM(starts[0][j-17:j+5])))
 
             if j < segLen - 13:
-                segmentTable[starts[0][j:j+18]] = calculateTM(starts[0][j:j+18])
+                reverseList.append((starts[0][j:j+18],calculateTM(starts[0][j:j+18])))
                 if j < segLen - 14:
-                    segmentTable[starts[0][j:j+19]] = calculateTM(starts[0][j:j+19])
+                    reverseList.append((starts[0][j:j+19],calculateTM(starts[0][j:j+19])))
                     if j < segLen - 15:
-                        segmentTable[starts[0][j:j+20]] = calculateTM(starts[0][j:j+20])
+                        reverseList.append((starts[0][j:j+20],calculateTM(starts[0][j:j+20])))
                         if j < segLen - 16:
-                            segmentTable[starts[0][j:j+21]] = calculateTM(starts[0][j:j+21])
+                            reverseList.append((starts[0][j:j+21],calculateTM(starts[0][j:j+21])))
                             if j < segLen - 17:
-                                segmentTable[starts[0][j:j+22]] = calculateTM(starts[0][j:j+22])
+                                reverseList.append((starts[0][j:j+22],calculateTM(starts[0][j:j+22])))
 
-
-
+##may switch out for other formulas to better match neb
 def calculateTM(primer):
     gcCount = sum([1 for x in primer if x == 'G' or x =='C'])
     atCount = sum([1 for x in primer if x == 'A' or x =='T'])

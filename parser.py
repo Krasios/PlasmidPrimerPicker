@@ -17,4 +17,4 @@ for f in rec.features:
 print(insertPosition)
 print(intronPositions)
 sample = Sample(rec.seq,insertPosition,intronPositions,rec.annotations['topology']=="circular")
-possibleInsertPrimers = findPossibleInsertPrimers(sample)
+possibleInsertPrimers = findPossiblePrimers(sample)

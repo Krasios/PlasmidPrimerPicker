@@ -2,10 +2,16 @@ class Sample:
 
     def __init__(self,sequence,insertPos,intronPos,circular):
         self.circular = circular
+        self.plasmid = self.circularPlasmid(sequence,insertPos) if circular else [sequence[:insertPos[0]],sequence[insertPos[1]:]]
         self.gDNA1 = OrientedSample(sequence,insertPos,intronPos,True,True)
         self.gDNA2 = OrientedSample(sequence,insertPos,intronPos,True,False)
         self.cDNA1 = OrientedSample(sequence,insertPos,intronPos,False,True)
         self.cDNA2 = OrientedSample(sequence,insertPos,intronPos,False,False)
+
+    def circularPlasmid(self,sequence,insertPos):
+        plasmid = list(sequence[insertPos[1]:])
+        plasmid.extend([sequence[:insertPos[0]]])
+        return plasmid
 
 class OrientedSample:
 
