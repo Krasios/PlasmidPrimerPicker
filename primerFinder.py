@@ -1,13 +1,7 @@
 from model import Sample,OrientedSample
 
 MIN_PRIMER_LENGTH =18
-segmentTable = {}
 
-plasmidForwardTable = {}
-plasmidReverseTable = {}
-segmentList = []
-plasmidForwardList = []
-plasmidReverseList = []
 
 def findGCClamps(seq):
     GCClampStarts = []
@@ -28,12 +22,28 @@ def findPossiblePrimers(sample):
     ##filter out fragments too short to match a primer
     commonInsertRegions = [x for x in commonInsertRegions if len(x) > MIN_PRIMER_LENGTH]
     possibleStarts = [(x,findGCClamps(x)) for x in commonInsertRegions]
-    populateTMList(possibleStarts,segmentList,segmentList)
+    segmentList = []
+    
+    populateTMList(possibleStarts,segmentList,segmentList)   
+    segmentList = [x for x in segmentList if GCInBounds(x[0])]
+    plasmidPairs = findPlasmidPrimerPairs(sample)
+    plasmidPairs = [x for x in plasmidPairs if GCInBounds(x[0][0]) and GCInBounds(x[1][0])] 
+    return [[x[0],y,x[1]] for x in plasmidPairs for y in segmentList if abs(x[0][1]-y[1])<5 and abs(x[1][1]-y[1])<5]
+
+def findPlasmidPrimerPairs(sample):
     possiblePlasmidStarts = [(x,findGCClamps(x)) for x in sample.plasmid]
-    populateTMList(possiblePlasmidStarts,plasmidForwardList,plasmidReverseList)
-    #TODO: make primer triplets here
-    print(sorted([(x[1],x[0])for x in segmentList]))
-    return []
+    if (sample.circular):
+        plasmidForwardList = []
+        plasmidReverseList = []
+        populateTMList(possiblePlasmidStarts,plasmidForwardList,plasmidReverseList)
+        return [[x,y] for x in plasmidForwardList for y in plasmidReverseList if abs(x[1]-y[1])<10]
+    plasmidForwardList = [[],[]]
+    plasmidReverseList = [[],[]]
+    populateTMList([possiblePlasmidStarts[0]],plasmidForwardList[0],plasmidReverseList[0])
+    populateTMList([possiblePlasmidStarts[1]],plasmidForwardList[1],plasmidReverseList[1])
+    retList = [[x,y] for x in plasmidForwardList[0] for y in plasmidReverseList[1] if abs(x[1]-y[1])<10]
+    retList.extend([[x,y] for x in plasmidForwardList[1] for y in plasmidReverseList[0] if abs(x[1]-y[1])<10])
+    return retList
 
 ##make segments
 def generateComplement(segment):
@@ -65,9 +75,13 @@ def populateTMList(segStarts,forwardList,reverseList):
                             reverseList.append((starts[0][j:j+21],calculateTM(starts[0][j:j+21])))
                             if j < segLen - 17:
                                 reverseList.append((starts[0][j:j+22],calculateTM(starts[0][j:j+22])))
-
+##todo:check for selfdimers
 ##may switch out for other formulas to better match neb
 def calculateTM(primer):
     gcCount = sum([1 for x in primer if x == 'G' or x =='C'])
     atCount = sum([1 for x in primer if x == 'A' or x =='T'])
     return 64.9+(41*(gcCount-16.4)/(gcCount+atCount))
+def GCInBounds(primer):
+    gcCount = sum([1 for x in primer if x == 'G' or x =='C'])
+    gcPercent = gcCount/len(primer)*100
+    return gcPercent>40 and gcPercent<60
