@@ -15,5 +15,11 @@ for f in rec.features:
         ##print("Intron sequence begins at {} and ends at {}".format(f.location.start,f.location.end))
         intronPositions.append((f.location.start.position,f.location.end.position))
 sample = Sample(rec.seq,insertPosition,intronPositions,rec.annotations['topology']=="circular")
-possiblePrimers = findPossiblePrimers(sample)
-print(possiblePrimers[:50])
+insertPrimers = findPossiblePrimers(sample)
+#print(insertPrimers)
+primers = findCompatiblePlasmidPrimerPair(sample,insertPrimers[0],False)
+if primers == None:
+    primers = findCompatiblePlasmidPrimerPair(sample,insertPrimers[1],True)
+#website uses primers object
+print(primers)
+

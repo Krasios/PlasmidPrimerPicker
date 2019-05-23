@@ -10,8 +10,8 @@ class Sample:
 
     def circularPlasmid(self,sequence,insertPos):
         plasmid = list(sequence[insertPos[1]:])
-        plasmid.extend([sequence[:insertPos[0]]])
-        return plasmid
+        plasmid.extend(sequence[:insertPos[0]])
+        return [plasmid]
 
 class OrientedSample:
 
