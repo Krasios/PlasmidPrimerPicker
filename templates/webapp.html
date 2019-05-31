@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+  <head>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/solid.css" integrity="sha384-rdyFrfAIC05c5ph7BKz3l5NG5yEottvO/DQ0dCrwD8gzeQDjYBHNr1ucUpQuljos" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/fontawesome.css" integrity="sha384-u5J7JghGz0qUrmEsWzBQkfvc8nK3fUT7DCaQzNQ+q4oEXhGSx+P2OqjWsfIRB8QT" crossorigin="anonymous">
+    <style>
+      input {
+        margin: 5px 3px;
+      }
+      .param {
+        font-size: 1.17em;
+      }
+      .form-element {
+        margin: 25px 0 10px 25px;
+      }
+      #introns {
+        font-weight:900;
+      }
+    </style>
+  </head>
+  <body>
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <ul>
+          {% for message in messages %}
+           <li>{{ message }}</li>
+         {% endfor %}
+        </ul>
+     {% endif %}
+    {% endwith %}
+    <h1>Primer Picker for Diagnostic PCR</h1>
+      <div>
+        <form method=post enctype=multipart/form-data>
+          <div class="form-element">
+            <label><span class="param">Input file: (.gb files only)*</span> <br/>
+              <input type=file name=plasmid>
+            </label>
+            <br/>
+            <br/>
+            <label>*Needs the following FEATURES labels: Introns and Inserts</span><br/>
+            </label>
+            <br/>
+          </div>
+         <input type="submit" value="Get Primer Suggestions!"><br>
+       </form>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+  <head>
+    <style>
+      ol {
+        list-style-type: decimal-leading-zero;
+      }
+      li {
+        font-size: 1.17em;
+      }
+    </style>
+  </head>
+  <body>
+    {% with primerz = results.primers %}
+      {% if primerz|length > 0 %}
+        <h2>Primers:</h2>
+        <ol>
+          {% for primer in primerz %}
+           <li>{{primer}}</li>
+         {% endfor %}
+        </ol>
+     {% endif %}
+    {% endwith %}
+    {% with attrib = results.attributes %}
+      {% if attrib %}
+        <h2>Attributes:</h2>
+        <li>{{attrib}}</li>
+     {% endif %}
+    {% endwith %}
+    <form method="GET">
+      <input type="submit" value="Run again"/>
+    </form>
+  </body>
+</html>
