@@ -35,7 +35,7 @@ def select_insert():
         
         data = parse(seqFile)
         if len(data) == 4:
-            results = {'primers': [data[0], data[1], data[2]], 'attributes': data[3]}
+            results = {'primers': [("".join(list(data[0][0])), "tm: " + str(data[0][1])), ("".join(list(data[1][0])), "tm: " + str(data[1][1])), ("".join(list(data[2][0])), "tm: " + str(data[2][1]))], 'attributes': ("gdna1: " + str(data[3][0]), "gdna2: " + str(data[3][1]), "cdna1: " + str(data[3][2]), "cdna2: " + str(data[3][3]))}
         else:
             results = {'primers': ["N/A", "N/A", "N/A"], 'attributes': "N/A"}
         return render_template('results.html', results=results)
