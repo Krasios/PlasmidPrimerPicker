@@ -63,14 +63,20 @@ def getAmpliconSizes(sample,insertPrimer,plasmidPrimer,plasmidPrimer2,reverse):
     insertMatches1 = [i.start(1) for i in re.finditer(insertPrimerAligned,str(sample.gDNA2.sequence))]
     insertMatches2 = [i.start(1) for i in re.finditer(insertPrimerComp,str(sample.cDNA1.sequence))]
     insertMatches3 = [i.start(1) for i in re.finditer(insertPrimerAligned,str(sample.cDNA2.sequence))]
+    if len(insertMatches0) != 1 or len(insertMatches1) != 1 or len(insertMatches2) != 1 or len(insertMatches3) != 1:
+        return [0,0,0,0]
     plasmidMatches0 = [i.start(1) for i in re.finditer(plasmidPrimer,str(sample.gDNA1.sequence))]
     plasmidMatches1 = [i.start(1) for i in re.finditer(plasmidPrimer,str(sample.gDNA2.sequence))]
     plasmidMatches2 = [i.start(1) for i in re.finditer(plasmidPrimer,str(sample.cDNA1.sequence))]
     plasmidMatches3 = [i.start(1) for i in re.finditer(plasmidPrimer,str(sample.cDNA2.sequence))]
+    if len(plasmidMatches0) != 1 or len(plasmidMatches1) != 1 or len(plasmidMatches2) != 1 or len(plasmidMatches3) != 1:
+        return [0,0,0,0]
     plasmidMatches20 = [i.start(1) for i in re.finditer(plasmidPrimer2,str(sample.gDNA1.sequence))]
     plasmidMatches21 = [i.start(1) for i in re.finditer(plasmidPrimer2,str(sample.gDNA2.sequence))]
     plasmidMatches22 = [i.start(1) for i in re.finditer(plasmidPrimer2,str(sample.cDNA1.sequence))]
     plasmidMatches23 = [i.start(1) for i in re.finditer(plasmidPrimer2,str(sample.cDNA2.sequence))]
+    if len(plasmidMatches20) != 1 or len(plasmidMatches21) != 1 or len(plasmidMatches22) != 1 or len(plasmidMatches23) != 1:
+        return [0,0,0,0]
     amplicons = []
     amplicons.append(plasmidMatches0[-1]-insertMatches0[0] if reverse else insertMatches0[-1]-plasmidMatches20[0])
     amplicons.append(insertMatches1[-1]-plasmidMatches21[0] if reverse else plasmidMatches1[-1]-insertMatches1[0])
